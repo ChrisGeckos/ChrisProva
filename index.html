@@ -2598,8 +2598,24 @@
             const nome = val('input-nome');
             const cognome = val('input-cognome');
             const oggetto = val('form-oggetto');
+
+            // Oggetto dell'e-mail in arrivo: per le prenotazioni include codice, fiera / modalità di ritiro
+            let oggettoMail = oggetto;
+            if (oggetto === 'Prenotazione') {
+                const ritiro = val('form-ritiro');
+                const codice = isVisible('campo-codice') ? val('input-codice') : '';
+                oggettoMail = 'Prenotazione' + (codice ? ' ' + codice : '');
+                if (ritiro === 'In fiera') {
+                    const fiera = isVisible('campo-fiera') ? val('select-fiera') : '';
+                    if (fiera) oggettoMail += ' - ' + fiera;
+                } else if (ritiro === 'Trasporto') {
+                    oggettoMail += ' (trasporto)';
+                } else if (ritiro === 'In allevamento') {
+                    oggettoMail += ' (ritiro in allevamento)';
+                }
+            }
             const payload = {
-                _subject: `Nuovo messaggio dal sito - ${oggetto}${nome ? ' - ' + nome + (cognome ? ' ' + cognome : '') : ''}`,
+                _subject: `Nuovo messaggio dal sito - ${oggettoMail}${nome ? ' - ' + nome + (cognome ? ' ' + cognome : '') : ''}`,
                 _template: 'table',
                 _captcha: 'false',
                 Nome: nome,
